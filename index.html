@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
     <title>Jeg elsker Runa</title>
     <style>
         :root {
@@ -29,6 +30,33 @@
 
         // Recalculate on resize
         window.addEventListener('resize', setVh);
+
+        // Service worker.
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, function(error) {
+                console.log('ServiceWorker registration failed: ', error);
+            });
+            });
+        }
+
+        // Call notification function.
+        fetch('https://notificationfunction.netlify.app/.netlify/functions/sendNotification', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: 'Greetings!',
+                message: 'This is a test push notification.',
+                url: 'https://yourdomain.com'
+            })
+        })
+            .then(response => response.json())
+            .then(data => console.log('Push sent:', data))
+            .catch(err => console.error('Error:', err));
     </script>
 </body>
 </html>
