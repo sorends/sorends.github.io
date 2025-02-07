@@ -26,3 +26,15 @@ self.addEventListener('fetch', function(event) {
       })
   );
 });
+
+self.addEventListener('push', function(event) {
+    const data = event.data.json();
+    const options = {
+      body: data.body,
+      icon: '/runa.png', // Update with your icon path
+      badge: '/runa.png'  // Update with your badge path
+    };
+    event.waitUntil(
+      self.registration.showNotification(data.title, options)
+    );
+  });
