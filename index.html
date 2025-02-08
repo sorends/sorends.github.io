@@ -78,7 +78,7 @@
         document.getElementById('notifyButton').addEventListener('click', async () => {
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
-                subscribeUser();
+                await subscribeUser();
 
                 // Call notification function.
                 fetch('https://notificationfunction.netlify.app/.netlify/functions/api/sendNotification', {
