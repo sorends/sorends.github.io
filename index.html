@@ -44,20 +44,29 @@
 
         const publicVapidKey = 'BH0q9jXgecblviheIyGhUA_rMeKofY12ouWbh69dNdAP7_b2lYrh6ohO2HHhdSHxTV4uR9Y-StRMNKWQBxNPlRE';
 
+        // Subscribe the user only if they're not already subscribed.
         async function subscribeUser() {
-            const registration = await navigator.serviceWorker.ready;
-            const subscription = await registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlB64ToUint8Array(publicVapidKey)
+        const registration = await navigator.serviceWorker.ready;
+        let subscription = await registration.pushManager.getSubscription();
+
+        if (!subscription) {
+            subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlB64ToUint8Array(publicVapidKey)
             });
-            // Send subscription to your server
+            // Send the new subscription to your server.
             await fetch('https://notificationfunction.netlify.app/.netlify/functions/api/subscribe', {
-                method: 'POST',
-                body: JSON.stringify(subscription),
-                headers: {
+            method: 'POST',
+            body: JSON.stringify(subscription),
+            headers: {
                 'Content-Type': 'application/json'
-                }
+            }
             });
+            console.log('User subscribed:', subscription);
+        } else {
+            console.log('User is already subscribed.');
+        }
+        return subscription;
         }
 
         // Utility function to convert the base64 public key to a Uint8Array
