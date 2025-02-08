@@ -12,8 +12,9 @@
     </style>
 </head>
 <body style="margin: 0; padding: 0; height: 100%;">
-    <div style="width: 100vw; height: calc(var(--vh, 1vh) * 100); display: flex; flex-direction: column; justify-content: space-between;">
-        <input type="button" id="notifyButton" style="font-size: 24px; padding: 25px; " value="Stop"/>
+    <div style="width: 100vw; height: calc(var(--vh, 1vh) * 100); display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
+        <input type="button" id="notifyButton" style="margin-top: 15%; font-size: 24px; padding: 25px; width: 50%;"/>
+        <div id="shieldText" style="font-size: 20px; width: 85%;"></div>
         <img src="runa.png" style="width: 100vw;"/>
     </div>
 
@@ -34,11 +35,11 @@
         // Service worker.
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            }, function(error) {
-                console.log('ServiceWorker registration failed: ', error);
-            });
+                navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(error) {
+                    console.log('ServiceWorker registration failed: ', error);
+                });
             });
         }
 
@@ -82,10 +83,22 @@
             return outputArray;
         }
 
+        let shieldEnabled = false;
+        function setShield(enabled) {
+            shieldEnabled = enabled;
+
+            document.getElementById('notifyButton').value = shieldEnabled ? "Jeg er klar igen!" : "Giv mig plads!";
+            document.getElementById('shieldText').innerHTML = shieldEnabled ? 
+                "Runa har brug for plads nu! Husk hvor meget du elsker hende, hvor meget hun har brug for pladsen lige nu og hvor dårligt hun får det hvis du ikke giver hende det! Husk at du mister hende hvis hun ikke kan få lov til at trække sig!" :
+                "Runa er klar til at tale ❤️";
+        }
+
         // Request notification permission and subscribe user on button click
         document.getElementById('notifyButton').addEventListener('click', async () => {
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
+                setShield(!shieldEnabled);
+
                 await subscribeUser();
 
                 // Call notification function.
@@ -107,6 +120,15 @@
                 console.error('Notification permission denied');
             }
         });
+
+        fetch('https://notificationfunction.netlify.app/.netlify/functions/api/shield', {
+            method: 'GET'
+        })
+        .then(response => response.json())
+        .then(data => {
+            setShield(data.shieldEnabled);
+        })
+        .catch(err => console.error('Error:', err));
     </script>
 </body>
 </html>
