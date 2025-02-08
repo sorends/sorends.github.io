@@ -13,8 +13,9 @@
 </head>
 <body style="margin: 0; padding: 0; height: 100%;">
     <div style="width: 100vw; height: calc(var(--vh, 1vh) * 100); display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
-        <input type="button" id="notifyButton" style="margin-top: 15%; font-size: 24px; padding: 25px; width: 50%;"/>
-        <div id="shieldText" style="font-size: 20px; width: 85%;"></div>
+        <input type="button" id="notifyButton" style="margin-top: 15%; font-size: 24px; padding: 25px;"/>
+        <div id="messageText" style="font-size: 20px; width: 85%;"></div>
+        <div id="speechBubbleText" style="position: absolute; bottom: 11%; right: 25%; display: flex;flex-direction: column;"></div>
         <img src="runa.png" style="width: 100vw;"/>
     </div>
 
@@ -88,9 +89,12 @@
             shieldEnabled = enabled;
 
             document.getElementById('notifyButton').value = shieldEnabled ? "Jeg er klar igen!" : "Giv mig plads!";
-            document.getElementById('shieldText').innerHTML = shieldEnabled ? 
+
+            document.getElementById('messageText').innerHTML = shieldEnabled ? 
                 "Runa har brug for plads nu! Husk hvor meget du elsker hende, hvor meget hun har brug for pladsen lige nu og hvor dårligt hun får det hvis du ikke giver hende det! Husk at du mister hende hvis hun ikke kan få lov til at trække sig!" :
                 "Runa er klar til at tale ❤️";
+
+            document.getElementById('speechBubbleText').innerHTML = shieldEnabled ? "<span>Det er nu du skal</span><span>passe på Runa!</span>" : "<span>Har du brug for</span><span>plads mubling?</span>";
         }
 
         // Request notification permission and subscribe user on button click
