@@ -42,10 +42,10 @@
 
     <div style="width: 100vw; height: calc(var(--vh, 1vh) * 100); display: flex; flex-direction: column; align-items: center;">
         <span style="margin-top: 10%; font-size: 24px;">Runas reflektioner</span>
-        <textarea name="message" rows="20" cols="45" style="margin-top: 5%;"></textarea>
+        <textarea name="runaMessage" rows="20" cols="45" style="margin-top: 5%;"></textarea>
 
         <span style="margin-top: 10%; font-size: 24px;">Sørens reflektioner</span>
-        <textarea name="message" rows="20" cols="45" style="margin-top: 5%;"></textarea>
+        <textarea name="soerenMessage" rows="20" cols="45" style="margin-top: 5%;"></textarea>
 
         <span id="userAgentText" style="margin-top: 10%; margin-left: 10%; margin-right: 10%;"></span>
     </div>
@@ -113,6 +113,14 @@
                 outputArray[i] = rawData.charCodeAt(i);
             }
             return outputArray;
+        }
+
+        function isIphone15Pro() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const dpr = window.devicePixelRatio;
+            
+            return width === 393 && height === 852;
         }
 
         let shieldEnabled = 0;
@@ -203,7 +211,7 @@
         })
         .catch(err => console.error('Error:', err));
 
-        document.getElementById('userAgentText').innerHTML = window.navigator.userAgent;
+        document.getElementById('userAgentText').innerHTML = isIphone15Pro() ? 'iPhone 15 Pro' : 'iPhone 16 Pro';
     </script>
 </body>
 </html>
