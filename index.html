@@ -119,7 +119,7 @@
             const width = window.innerWidth;
             const height = window.innerHeight;
             
-            return width === 393 && height === 852;
+            return width === 393 && height === 793;
         }
 
         let shieldEnabled = 0;
@@ -133,16 +133,18 @@
             document.getElementById('readyButton').classList.remove('hidden');
             document.getElementById('readyButton').classList.add('hidden');
 
-            if (shieldEnabled != 0) {
-                document.getElementById('readyButton').classList.remove('hidden');
-            }
-            
-            if (shieldEnabled != 1) {
-                document.getElementById('limitedShieldButton').classList.remove('hidden');
-            }
+            if (!isIphone15Pro()) {
+                if (shieldEnabled != 0) {
+                    document.getElementById('readyButton').classList.remove('hidden');
+                }
+                
+                if (shieldEnabled != 1) {
+                    document.getElementById('limitedShieldButton').classList.remove('hidden');
+                }
 
-            if (shieldEnabled != 2) {
-                document.getElementById('shieldButton').classList.remove('hidden');
+                if (shieldEnabled != 2) {
+                    document.getElementById('shieldButton').classList.remove('hidden');
+                }
             }
             
             let messageText = null;
