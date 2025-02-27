@@ -35,7 +35,7 @@
             <input type="button" id="shieldButton" class="bg-red hidden" style="margin-bottom: 5%; font-size: 24px; padding: 25px;" value="Giv mig plads!"/>
         </div>
         
-        <div id="messageText" style="font-size: 20px; width: 85%;"></div>
+        <div id="messageText" style="font-size: 16px; width: 85%;"></div>
         <div id="speechBubbleText" style="position: absolute; bottom: 11%; right: 22%; display: flex;flex-direction: column;"></div>
         <img src="runa.png" style="width: 100vw;"/>
     </div>
@@ -159,7 +159,7 @@
         async function sendShieldChange(enabled) {
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
-                setShield(!enabled);
+                setShield(enabled);
 
                 await subscribeUser();
 
