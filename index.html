@@ -9,22 +9,53 @@
         :root {
             --vh: 100vh;
         }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .bg-green {
+            background-color: green;
+        }
+
+        .bg-yellow {
+            background-color: yellow;
+        }
+
+        .bg-red {
+            background-color: red;
+        }
     </style>
 </head>
 <body style="margin: 0; padding: 0; height: 100%;">
     <div style="width: 100vw; height: calc(var(--vh, 1vh) * 100); display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
-        <input type="button" id="notifyButton" style="margin-top: 15%; font-size: 24px; padding: 25px;"/>
+        <div style="margin-top: 10%; display: flex; flex-direction: column; align-items: center;">
+            <input type="button" id="readyButton" class="bg-green hidden" style="margin-bottom: 5%; font-size: 24px; padding: 25px;" value="Jeg er klar igen!"/>
+            <input type="button" id="limitedShieldButton" class="bg-yellow hidden" style="margin-bottom: 5%; font-size: 24px; padding: 25px;" value="Jeg er kun klar til at skrive!"/>
+            <input type="button" id="shieldButton" class="bg-red hidden" style="margin-bottom: 5%; font-size: 24px; padding: 25px;" value="Giv mig plads!"/>
+        </div>
+        
         <div id="messageText" style="font-size: 20px; width: 85%;"></div>
         <div id="speechBubbleText" style="position: absolute; bottom: 11%; right: 22%; display: flex;flex-direction: column;"></div>
         <img src="runa.png" style="width: 100vw;"/>
     </div>
 
+    <div class="hidden" style="width: 100vw; height: calc(var(--vh, 1vh) * 100); display: flex; flex-direction: column; align-items: center;">
+        <span style="margin-top: 10%; font-size: 24px;">Runas reflektioner</span>
+        <textarea name="message" rows="20" cols="45" style="margin-top: 5%;"></textarea>
+
+        <span style="margin-top: 10%; font-size: 24px;">Sørens reflektioner</span>
+        <textarea name="message" rows="20" cols="45" style="margin-top: 5%;"></textarea>
+
+        <span id="userAgentText" style="margin-top: 10%; margin-left: 10%; margin-right: 10%;"></span>
+    </div>
+
     <script>
         function setVh() {
-        // Get the viewport height and multiply it by 1% to get a value for a vh unit
-        let vh = window.innerHeight * 0.01;
-        // Set the value in the --vh custom property to the root of the document
-        document.documentElement.style.setProperty('--vh', `${vh}px`);
+            // Get the viewport height and multiply it by 1% to get a value for a vh unit
+            let vh = window.innerHeight * 0.01;
+            // Set the value in the --vh custom property to the root of the document
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
         }
 
         // Call the function initially
@@ -84,37 +115,62 @@
             return outputArray;
         }
 
-        let shieldEnabled = false;
+        let shieldEnabled = 0;
         function setShield(enabled) {
             shieldEnabled = enabled;
 
-            document.getElementById('notifyButton').value = shieldEnabled ? "Jeg er klar igen!" : "Giv mig plads!";
+            document.getElementById('shieldButton').classList.remove('hidden');
+            document.getElementById('shieldButton').classList.add('hidden');
+            document.getElementById('limitedShieldButton').classList.remove('hidden');
+            document.getElementById('limitedShieldButton').classList.add('hidden');
+            document.getElementById('readyButton').classList.remove('hidden');
+            document.getElementById('readyButton').classList.add('hidden');
 
-            document.getElementById('messageText').innerHTML = shieldEnabled ? 
-                "Runa har brug for plads nu! Husk hvor meget du elsker hende, hvor meget hun har brug for pladsen lige nu og hvor dårligt hun får det hvis du ikke giver hende det! Husk at du mister hende hvis hun ikke kan få lov til at trække sig!" :
-                "Runa er klar til at tale ❤️";
+            if (shieldEnabled != 0) {
+                document.getElementById('readyButton').classList.remove('hidden');
+            }
+            
+            if (shieldEnabled != 1) {
+                document.getElementById('limitedShieldButton').classList.remove('hidden');
+            }
+
+            if (shieldEnabled != 2) {
+                document.getElementById('shieldButton').classList.remove('hidden');
+            }
+            
+            let messageText = null;
+            switch (shieldEnabled) {
+                case 1:
+                    messageText = "Runa er kun klar til skrive! Husk hvor meget du elsker hende, hvor meget hun har brug for pladsen lige nu og hvor dårligt hun får det hvis du ikke giver hende det! Husk at du mister hende hvis hun ikke kan få lov til at trække sig!";
+                    break;
+                case 2:
+                    messageText = "Runa har brug for plads nu! Husk hvor meget du elsker hende, hvor meget hun har brug for pladsen lige nu og hvor dårligt hun får det hvis du ikke giver hende det! Husk at du mister hende hvis hun ikke kan få lov til at trække sig!";
+                    break;
+                default:
+                    messageText = "Runa er klar til at tale ❤️";
+                    break;
+            }
+
+            document.getElementById('messageText').innerHTML = messageText;
 
             document.getElementById('speechBubbleText').innerHTML = shieldEnabled ? "<span>Det er nu du skal</span><span>passe på Runa!</span>" : "<span>Har du brug for</span><span>plads mubling?</span>";
         }
 
-        // Request notification permission and subscribe user on button click
-        document.getElementById('notifyButton').addEventListener('click', async () => {
+        async function sendShieldChange(enabled) {
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
-                setShield(!shieldEnabled);
+                setShield(!enabled);
 
                 await subscribeUser();
 
                 // Call notification function.
-                fetch('https://notificationfunction.netlify.app/.netlify/functions/api/sendNotification', {
+                fetch('https://notificationfunction.netlify.app/.netlify/functions/api/shield', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        title: 'Greetings!',
-                        message: 'This is a test push notification.',
-                        url: 'https://www.iloveruna.com/'
+                        shieldEnabled: enabled
                     })
                 })
                 .then(response => response.json())
@@ -123,6 +179,19 @@
             } else {
                 console.error('Notification permission denied');
             }
+        }
+
+        // Request notification permission and subscribe user on button click
+        document.getElementById('readyButton').addEventListener('click', async () => {
+            await sendShieldChange(0);
+        });
+
+        document.getElementById('limitedShieldButton').addEventListener('click', async () => {
+            await sendShieldChange(1);
+        });
+
+        document.getElementById('shieldButton').addEventListener('click', async () => {
+            await sendShieldChange(2);
         });
 
         fetch('https://notificationfunction.netlify.app/.netlify/functions/api/shield', {
@@ -133,6 +202,8 @@
             setShield(data.shieldEnabled);
         })
         .catch(err => console.error('Error:', err));
+
+        document.getElementById('userAgentText').innerHTML = window.navigator.userAgent;
     </script>
 </body>
 </html>
