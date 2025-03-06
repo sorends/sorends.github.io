@@ -14,6 +14,10 @@
             display: none !important;
         }
 
+        .bg-lightblue {
+            background-color: lightblue;
+        }
+
         .bg-green {
             background-color: green;
         }
@@ -31,6 +35,7 @@
     <div style="width: 100vw; height: calc(var(--vh, 1vh) * 100); display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
         <div style="margin-top: 10%; display: flex; flex-direction: column; align-items: center;">
             <input type="button" id="readyButton" class="bg-green hidden" style="margin-bottom: 5%; font-size: 16px; padding: 10px; color: black;" value="Jeg er klar igen!"/>
+            <input type="button" id="meetMeButton" class="bg-lightblue hidden" style="margin-bottom: 5%; font-size: 16px; padding: 10px; color: black;" value="Jeg vil mødes i mine følelser!"/>
             <input type="button" id="limitedShieldButton" class="bg-yellow hidden" style="margin-bottom: 5%; font-size: 16px; padding: 10px; color: black;" value="Jeg er kun klar til at skrive!"/>
             <input type="button" id="shieldButton" class="bg-red hidden" style="margin-bottom: 5%; font-size: 16px; padding: 10px; color: black;" value="Giv mig plads!"/>
         </div>
@@ -126,23 +131,29 @@
         function setShield(enabled) {
             shieldEnabled = enabled;
 
-            document.getElementById('shieldButton').classList.remove('hidden');
-            document.getElementById('shieldButton').classList.add('hidden');
-            document.getElementById('limitedShieldButton').classList.remove('hidden');
-            document.getElementById('limitedShieldButton').classList.add('hidden');
             document.getElementById('readyButton').classList.remove('hidden');
             document.getElementById('readyButton').classList.add('hidden');
+            document.getElementById('meetMeButton').classList.remove('hidden');
+            document.getElementById('meetMeButton').classList.add('hidden');
+            document.getElementById('limitedShieldButton').classList.remove('hidden');
+            document.getElementById('limitedShieldButton').classList.add('hidden');
+            document.getElementById('shieldButton').classList.remove('hidden');
+            document.getElementById('shieldButton').classList.add('hidden');
 
             if (!isIphone15Pro()) {
                 if (shieldEnabled != 0) {
                     document.getElementById('readyButton').classList.remove('hidden');
                 }
-                
+
                 if (shieldEnabled != 1) {
+                    document.getElementById('meetMeButton').classList.remove('hidden');
+                }
+                
+                if (shieldEnabled != 2) {
                     document.getElementById('limitedShieldButton').classList.remove('hidden');
                 }
 
-                if (shieldEnabled != 2) {
+                if (shieldEnabled != 3) {
                     document.getElementById('shieldButton').classList.remove('hidden');
                 }
             }
@@ -150,9 +161,12 @@
             let messageText = null;
             switch (shieldEnabled) {
                 case 1:
-                    messageText = "Runa er kun klar til skrive! Husk hvor meget du elsker hende, hvor meget hun har brug for pladsen lige nu og hvor dårligt hun får det hvis du ikke giver hende det! Husk at du mister hende hvis hun ikke kan få lov til at trække sig!";
+                    messageText = "Runa vil gerne mødes i sine følelser! Husk hvor meget du elsker hende, hvor meget hun har brug for at blive mødt i sine følelser lige nu og hvor dårligt hun får det hvis du ikke møder hende i det! Husk at du mister hende hvis du efterlader hende der følelsesmæssigt!";
                     break;
                 case 2:
+                    messageText = "Runa er kun klar til skrive! Husk hvor meget du elsker hende, hvor meget hun har brug for pladsen lige nu og hvor dårligt hun får det hvis du ikke giver hende det! Husk at du mister hende hvis hun ikke kan få lov til at trække sig!";
+                    break;
+                case 3:
                     messageText = "Runa har brug for plads nu! Husk hvor meget du elsker hende, hvor meget hun har brug for pladsen lige nu og hvor dårligt hun får det hvis du ikke giver hende det! Husk at du mister hende hvis hun ikke kan få lov til at trække sig!";
                     break;
                 default:
@@ -195,12 +209,16 @@
             await sendShieldChange(0);
         });
 
-        document.getElementById('limitedShieldButton').addEventListener('click', async () => {
+        document.getElementById('meetMeButton').addEventListener('click', async () => {
             await sendShieldChange(1);
         });
 
-        document.getElementById('shieldButton').addEventListener('click', async () => {
+        document.getElementById('limitedShieldButton').addEventListener('click', async () => {
             await sendShieldChange(2);
+        });
+
+        document.getElementById('shieldButton').addEventListener('click', async () => {
+            await sendShieldChange(3);
         });
 
         fetch('https://notificationfunction.netlify.app/.netlify/functions/api/shield', {
